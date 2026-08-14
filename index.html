@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Anúncios Bling</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Gerador de Anúncios Bling</h1>
+      <p>Gere planilha pronta para importar no Bling com pai, variações, estoque e fotos</p>
+    </header>
+
+    <!-- 1. DADOS -->
+    <section class="card">
+      <h2>1. Dados do Produto</h2>
+      <div class="form-grid">
+        <div class="field">
+          <label>Título base / Nome do produto *</label>
+          <input type="text" id="tituloBase" placeholder="Ex: Sandália Papete Beira Rio 8524.110" />
+        </div>
+        <div class="field">
+          <label>SKU base (código pai) *</label>
+          <input type="text" id="codigoPai" placeholder="Ex: 8524.110-L4" />
+        </div>
+        <div class="field">
+          <label>Preço (R$) *</label>
+          <input type="number" id="preco" step="0.01" placeholder="109.90" />
+        </div>
+        <div class="field">
+          <label>NCM</label>
+          <select id="ncm">
+            <option value="6402.99.90">6402.99.90 — Sandálias etc</option>
+            <option value="6402.20.00">6402.20.00 — Chinelos</option>
+            <option value="6402.91.90">6402.91.90 — Botas</option>
+            <option value="4202.21.00">4202.21.00 — Bolsas</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Categoria</label>
+          <select id="categoria">
+            <option value="">Sem categoria</option>
+            <option>Acess Inf>Vestuário de Chuva>Galochas SHOPEE</option>
+            <option>Bolsa feminina ML Shopee e Shein</option>
+            <option>Bota Masculina ML, Shopee</option>
+            <option>Bota masculina Shopee</option>
+            <option>Botas</option>
+            <option>Botas Femininas ML, Amazon Shopee Shein</option>
+            <option>Calçados de Menino > Sandálias SHOPEE e Shein</option>
+            <option>Calçados, Roupas e Bolsas Calçados Alpargata</option>
+            <option>Chinelos Femininos Shoppe, Shien, ML</option>
+            <option>Chinelos masculino Shoppe, Shien, ML</option>
+            <option>ESP. At Calç Esport, Chuteira de Futsal SHOPEE</option>
+            <option>Esportes e Fitness Futebol Roupas Chuteiras ML</option>
+            <option>Infantil > Menina > Chinelos SHOPEE</option>
+            <option>ML Calçados, Roupas e Bolsas Calçados</option>
+            <option>Moda Infantil > Menino > Chinelos SHOPEE</option>
+            <option>Moda Infantil > Calçados Menino > Botas SHOPPE</option>
+            <option>Moda Infantil Calçados de Menina Botas SHOPEE</option>
+            <option>Saltos, Tamancos ML,SHEIN, SHOPEE</option>
+            <option>sandália menina infantil SHOPPE, SHEIN, ML</option>
+            <option>Sandália Papete ortopédica ML, Shopee, Shein</option>
+            <option>Sandália Plana SHOPEE</option>
+            <option>Sandálias e Chinelos</option>
+            <option>Sandálias e Chinelos > Sandália Ergométrica Shopee</option>
+            <option>Sandálias masculina Shopee</option>
+            <option>Sapatilhas Femininas ML Shein Shopee</option>
+            <option>Sapato feminino Shopee</option>
+            <option>Sapato masculino Shopee</option>
+            <option>Sapatos Femininos > Plataformas SHOPEE</option>
+            <option>Sapatos Sociais e Mocassims</option>
+            <option>Sapatos Sociais, Mocassims ML e SHEIN, SHOPPE</option>
+            <option>Scarpins e plataforma ML, Amazon, Shein, Shopee</option>
+            <option>SHEIN Sandálias de salto feminino</option>
+            <option>SHOPEE Sapatos fem Slip ons, Mary Janes e Mules</option>
+            <option>Tenis Masculino ML, Shopee, Shein</option>
+            <option>Tênis Feminino Mercadolivre Amazon Shein Shopee</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Botão peso e dimensões -->
+      <button type="button" id="btnDimensoes" class="btn-dimensoes incompleto" onclick="abrirModalDimensoes()">
+        Ver peso e dimensões
+      </button>
+
+      <div class="field">
+        <label>Tipo de grade de tamanho</label>
+        <select id="tipoTamanho">
+          <option value="mulher">Mulher (33-40)</option>
+          <option value="homem">Homem (37-45)</option>
+          <option value="adolescente">Adolescente (26-33)</option>
+          <option value="infantil">Infantil (17-26)</option>
+          <option value="havaianas-infantil">Havaianas Infantil</option>
+          <option value="custom">Personalizado</option>
+        </select>
+      </div>
+
+      <div class="field" id="tamanhosCustomWrap" style="display:none">
+        <label>Tamanhos (separados por vírgula)</label>
+        <input type="text" id="tamanhosCustom" placeholder="34,35,36,37,38,39" />
+      </div>
+
+      <div class="field">
+        <label>Estoque por tamanho e cor (0 a 100)</label>
+        <div id="listaEstoques"></div>
+      </div>
+    </section>
+
+    <!-- 2. CORES -->
+    <section class="card">
+      <h2>2. Cores e SKUs</h2>
+      <div id="listaCores"></div>
+      <button type="button" class="btn secondary" onclick="adicionarCor()">+ Adicionar cor</button>
+    </section>
+
+    <!-- 3. FOTOS -->
+    <section class="card">
+      <h2>3. Fotos por Cor</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px">
+        A <strong>primeira cor</strong> define as fotos do produto pai. Cada cor tem até 4 fotos.
+      </p>
+      <div id="fotosPorCor"></div>
+    </section>
+
+    <!-- 4. IA -->
+    <section class="card">
+      <h2>4. Gerar Títulos e Descrições (IA)</h2>
+      <button type="button" class="btn primary" onclick="gerarConteudo()">Gerar com Grok</button>
+      <div id="resultadoIA" class="resultado-ia" style="display:none">
+        <div class="field">
+          <label>Escolha o título</label>
+          <div id="opcoesTitulos"></div>
+        </div>
+        <div class="field">
+          <label>Escolha a descrição</label>
+          <div id="opcoesDescricoes"></div>
+        </div>
+      </div>
+      <div id="statusIA" class="status"></div>
+    </section>
+
+    <!-- 5. PLANILHA -->
+    <section class="card">
+      <h2>5. Baixar Planilha</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">
+        Gera o Excel no modelo oficial do Bling, com pai, variações, estoque, SKUs e fotos.
+      </p>
+      <div class="botoes-acao">
+        <button type="button" class="btn primary" onclick="gerarExcel()">Baixar Planilha Bling</button>
+      </div>
+      <div id="status" class="status"></div>
+    </section>
+  </div>
+
+  <!-- MODAL PESO E DIMENSÕES -->
+  <div id="modalDimensoes" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Peso e Dimensões</h3>
+        <button type="button" class="modal-close" onclick="fecharModalDimensoes()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>Peso líquido (Kg)</label>
+            <input type="number" id="pesoLiquido" step="0.001" placeholder="0.800" oninput="validarDimensoes()" />
+          </div>
+          <div class="field">
+            <label>Peso bruto (Kg)</label>
+            <input type="number" id="pesoBruto" step="0.001" placeholder="0.900" oninput="validarDimensoes()" />
+          </div>
+          <div class="field">
+            <label>Largura (cm)</label>
+            <input type="number" id="largura" step="0.01" placeholder="18" oninput="validarDimensoes()" />
+          </div>
+          <div class="field">
+            <label>Altura (cm)</label>
+            <input type="number" id="altura" step="0.01" placeholder="15" oninput="validarDimensoes()" />
+          </div>
+          <div class="field">
+            <label>Profundidade (cm)</label>
+            <input type="number" id="profundidade" step="0.01" placeholder="30" oninput="validarDimensoes()" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn primary" onclick="fecharModalDimensoes()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
