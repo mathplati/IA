@@ -4,13 +4,14 @@ let descricoesGeradas = [];
 let tituloSelecionado = '';
 let descricaoSelecionada = '';
 let estoques = {};
+let camposCustomizados = [];
 
 const grades = {
-  mulher: [33,34,35,36,37,38,39,40],
-  homem: [37,38,39,40,41,42,43,44,45],
-  adolescente: [26,27,28,29,30,31,32,33],
-  infantil: [17,18,19,20,21,22,23,24,25,26],
-  'havaianas-infantil': ['17/18','19/20','21/22','23/24','25/26']
+  mulher: [33, 34, 35, 36, 37, 38, 39, 40],
+  homem: [37, 38, 39, 40, 41, 42, 43, 44, 45],
+  adolescente: [26, 27, 28, 29, 30, 31, 32, 33],
+  infantil: [17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+  'havaianas-infantil': ['17/18', '19/20', '21/22', '23/24', '25/26']
 };
 
 const departamentos = {
@@ -94,27 +95,22 @@ function getTamanhos() {
 function renderEstoques() {
   const container = document.getElementById('listaEstoques');
   if (!container) return;
-
   const tamanhos = getTamanhos();
   const coresValidas = cores.filter(c => c.nome.trim());
-
   if (!tamanhos.length) {
     container.innerHTML = '<p style="color:var(--muted)">Escolha a grade de tamanho.</p>';
     return;
   }
-
   if (!coresValidas.length) {
     container.innerHTML = '<p style="color:var(--muted)">Adicione pelo menos uma cor para definir estoque.</p>';
     return;
   }
-
   coresValidas.forEach(cor => {
     if (!estoques[cor.nome]) estoques[cor.nome] = {};
     tamanhos.forEach(tam => {
       if (estoques[cor.nome][tam] === undefined) estoques[cor.nome][tam] = 0;
     });
   });
-
   let html = `
     <table class="estoque-table">
       <thead>
@@ -125,7 +121,6 @@ function renderEstoques() {
       </thead>
       <tbody>
   `;
-
   tamanhos.forEach(tam => {
     html += `<tr><td><strong>${tam}</strong></td>`;
     coresValidas.forEach(cor => {
@@ -138,7 +133,6 @@ function renderEstoques() {
     });
     html += `</tr>`;
   });
-
   html += `</tbody></table>`;
   container.innerHTML = html;
 }
@@ -166,7 +160,6 @@ function removerCor(id) {
 function renderCores() {
   const container = document.getElementById('listaCores');
   container.innerHTML = '';
-
   cores.forEach((cor, index) => {
     const div = document.createElement('div');
     div.className = 'cor-item';
@@ -201,12 +194,10 @@ function atualizarNomeCor(index, novoNome) {
 function renderFotosPorCor() {
   const container = document.getElementById('fotosPorCor');
   container.innerHTML = '';
-
   if (cores.length === 0) {
     container.innerHTML = '<p style="color:var(--muted)">Adicione uma cor primeiro.</p>';
     return;
   }
-
   cores.forEach((cor, index) => {
     const bloco = document.createElement('div');
     bloco.style.marginBottom = '24px';
@@ -224,10 +215,8 @@ function renderFotosPorCor() {
       <div class="fotos-preview" id="preview-${index}"></div>
     `;
     container.appendChild(bloco);
-
     const dropzone = document.getElementById(`dropzone-${index}`);
     const input = dropzone.querySelector('input[type=file]');
-
     dropzone.addEventListener('click', () => input.click());
     dropzone.addEventListener('dragover', (e) => {
       e.preventDefault();
@@ -243,14 +232,12 @@ function renderFotosPorCor() {
       adicionarArquivosCor(index, e.target.files);
       e.target.value = '';
     });
-
     renderPreviewCor(index);
   });
 }
 
 function adicionarArquivosCor(corIndex, fileList) {
   const novos = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-
   for (const file of novos) {
     if (cores[corIndex].arquivos.length >= 4) break;
     if (file.size > 25 * 1024 * 1024) {
@@ -271,7 +258,6 @@ function renderPreviewCor(corIndex) {
   const container = document.getElementById(`preview-${corIndex}`);
   if (!container) return;
   container.innerHTML = '';
-
   cores[corIndex].arquivos.forEach((file, i) => {
     const url = URL.createObjectURL(file);
     const div = document.createElement('div');
@@ -307,23 +293,18 @@ async function gerarConteudo() {
     mostrarStatus('Preencha o título base primeiro.', 'erro', 'statusIA');
     return;
   }
-
   mostrarStatus('Gerando títulos e descrições com Grok...', 'carregando', 'statusIA');
-
   try {
     const res = await fetch('/gerar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tituloBase })
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-
     titulosGerados = data.titulos || [];
     descricoesGeradas = data.descricoes || [];
     document.getElementById('resultadoIA').style.display = 'block';
-
     const titulosDiv = document.getElementById('opcoesTitulos');
     titulosDiv.innerHTML = '';
     titulosGerados.forEach((t, i) => {
@@ -341,7 +322,6 @@ async function gerarConteudo() {
       }
       titulosDiv.appendChild(div);
     });
-
     const descDiv = document.getElementById('opcoesDescricoes');
     descDiv.innerHTML = '';
     descricoesGeradas.forEach((d, i) => {
@@ -359,24 +339,91 @@ async function gerarConteudo() {
       }
       descDiv.appendChild(div);
     });
-
     mostrarStatus('Conteúdo gerado! Escolha título e descrição.', 'sucesso', 'statusIA');
   } catch (err) {
     mostrarStatus('Erro ao gerar: ' + err.message, 'erro', 'statusIA');
   }
 }
 
+async function preencherCamposCustomizados() {
+  const categoria = document.getElementById('categoria').value;
+  const tituloBase = document.getElementById('tituloBase').value.trim();
+  const tipoGrade = document.getElementById('tipoTamanho').value;
+  const generoHint = departamentos[tipoGrade] || '';
+
+  if (!categoria) {
+    mostrarStatus('Escolha a categoria primeiro.', 'erro', 'statusCampos');
+    return;
+  }
+
+  mostrarStatus('Preenchendo campos customizados com Grok...', 'carregando', 'statusCampos');
+  try {
+    const res = await fetch('/preencher-campos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        categoria,
+        tituloBase,
+        cores: cores.map(c => ({ nome: c.nome })),
+        generoHint
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    camposCustomizados = data.campos || [];
+    renderCamposCustomizados();
+
+    if (data.aviso) {
+      mostrarStatus(data.aviso, 'sucesso', 'statusCampos');
+    } else {
+      mostrarStatus(
+        `Campos preenchidos (${camposCustomizados.filter(c => c.valor).length} com valor). Revise e ajuste se quiser.`,
+        'sucesso',
+        'statusCampos'
+      );
+    }
+  } catch (err) {
+    mostrarStatus('Erro campos: ' + err.message, 'erro', 'statusCampos');
+  }
+}
+
+function renderCamposCustomizados() {
+  const box = document.getElementById('camposCustomBox');
+  const lista = document.getElementById('listaCamposCustom');
+  if (!box || !lista) return;
+
+  if (!camposCustomizados.length) {
+    box.style.display = 'none';
+    lista.innerHTML = '';
+    return;
+  }
+
+  box.style.display = 'block';
+  lista.innerHTML = camposCustomizados.map((c, i) => `
+    <div class="field">
+      <label>${c.nome}</label>
+      <input type="text" value="${(c.valor || '').replace(/"/g, '&quot;')}"
+        onchange="camposCustomizados[${i}].valor = this.value" />
+    </div>
+  `).join('');
+}
+
+function getCamposCustomTexto() {
+  return camposCustomizados
+    .filter(c => c.valor && String(c.valor).trim())
+    .map(c => `${c.nome}: ${c.valor}`)
+    .join(' | ');
+}
+
 async function uploadFotosCor(arquivos) {
   if (!arquivos || arquivos.length === 0) return [];
-
   const formData = new FormData();
   arquivos.forEach(file => formData.append('fotos', file));
-
   const res = await fetch('/processar-fotos', {
     method: 'POST',
     body: formData
   });
-
   const data = await res.json();
   if (data.error) throw new Error(data.error);
   return data.urls || [];
@@ -394,6 +441,7 @@ async function gerarExcel() {
   const dim = getDimensoes();
   const tamanhos = getTamanhos();
   const coresValidas = cores.filter(c => c.nome.trim());
+  const infoAdicional = getCamposCustomTexto();
 
   if (!nome || !codigoPai || !preco || !coresValidas.length || !tamanhos.length) {
     mostrarStatus('Preencha os dados antes de gerar o Excel.', 'erro');
@@ -402,7 +450,6 @@ async function gerarExcel() {
 
   try {
     mostrarStatus('Processando fotos (PhotoRoom) e gerando planilha...', 'carregando');
-
     const coresComUrls = [];
     for (const cor of coresValidas) {
       const fotosUrls = await uploadFotosCor(cor.arquivos);
@@ -447,12 +494,11 @@ async function gerarExcel() {
       '0', 'Não', 'NOVO',
       'NÃO', '', '', departamento, 'Centímetro',
       '0', '0', '0',
-      '0', categoria, ''
+      '0', categoria, infoAdicional
     ]);
 
     coresComUrls.forEach(cor => {
       const fotosCor = (cor.fotosUrls || []).join('|');
-
       tamanhos.forEach(tam => {
         const tamNumero = String(tam).replace(/\s*BR\s*/i, '').trim();
         const codigoVar = cor.sku
@@ -477,7 +523,7 @@ async function gerarExcel() {
           '0', 'Sim', 'NOVO',
           'NÃO', '', '', departamento, 'Centímetro',
           '0', '0', '0',
-          '0', categoria, ''
+          '0', categoria, infoAdicional
         ]);
       });
     });
@@ -485,14 +531,13 @@ async function gerarExcel() {
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Produtos');
-
     const nomeArquivo = nomeArquivoSeguro(nome) + '.xlsx';
     XLSX.writeFile(wb, nomeArquivo);
 
     mostrarStatus(
       `✅ Planilha gerada: <strong>${nomeArquivo}</strong><br>
        Variações: <strong>${rows.length - 1}</strong><br>
-       Fotos processadas no PhotoRoom (1300x1300 JPEG)`,
+       Campos custom: <strong>${camposCustomizados.filter(c => c.valor).length}</strong> preenchidos`,
       'sucesso'
     );
   } catch (err) {
