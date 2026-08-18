@@ -408,17 +408,20 @@ function renderCamposCustomizados() {
     </div>
   `).join('');
 }
+
+function getCamposCustomTexto() {
+  return camposCustomizados
+    .filter(c => c.valor && String(c.valor).trim())
+    .map(c => `${c.nome}: ${c.valor}`)
+    .join(' | ');
+}
+
 async function enviarCamposBling() {
   const codigoPai = document.getElementById('codigoPai').value.trim();
   if (!codigoPai) {
     mostrarStatus('Preencha o SKU base (código pai).', 'erro', 'statusCampos');
     return;
   }
-  if (!camposCustomizados.length) {
-    mostrarStatus('Preencha os campos com IA antes de enviar.', 'erro', 'statusCampos');
-    return;
-  }
-
   const preenchidos = camposCustomizados.filter(c => c.valor && String(c.valor).trim());
   if (!preenchidos.length) {
     mostrarStatus('Nenhum campo com valor para enviar.', 'erro', 'statusCampos');
@@ -433,7 +436,13 @@ async function enviarCamposBling() {
       body: JSON.stringify({ codigoPai, campos: preenchidos })
     });
     const data = await res.json();
-    if (data.error) throw new Error(data.error);
+    if (data.error) {
+      let extra = '';
+      if (data.naoEncontrados?.length) {
+        extra = '<br>Não encontrados: ' + data.naoEncontrados.join(', ');
+      }
+      throw new Error(data.error + extra);
+    }
 
     let msg = `✅ ${data.enviados} campo(s) enviados pro produto ID ${data.produtoId}`;
     if (data.naoEncontrados?.length) {
@@ -443,12 +452,6 @@ async function enviarCamposBling() {
   } catch (err) {
     mostrarStatus('Erro ao enviar: ' + err.message, 'erro', 'statusCampos');
   }
-}
-function getCamposCustomTexto() {
-  return camposCustomizados
-    .filter(c => c.valor && String(c.valor).trim())
-    .map(c => `${c.nome}: ${c.valor}`)
-    .join(' | ');
 }
 
 async function uploadFotosCor(arquivos) {
