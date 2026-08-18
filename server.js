@@ -414,7 +414,119 @@ function limparFinalDescricao(texto) {
     .replace(/Somos especialistas em calçados femininos[\s\S]*$/i, '')
     .trim();
 }
+app.post('/enviar-campos-bling', async (req, res) => {
+  try {
+    const { codigoPai, campos = [] } = req.body;
+    if (!codigoPai) return res.status(400).json({ error: 'codigoPai obrigatório' });
+    if (!campos.length) return res.status(400).json({ error: 'Nenhum campo para enviar' });
 
+    // 1) busca produto pelo código
+    const busca = await blingRequest(
+      `https://www.bling.com.br/Api/v3/produtos?codigo=${encodeURIComponent(codigoPai)}`
+    );
+    const buscaData = await busca.json();
+    const produto = buscaData?.data?.[0];
+    if (!produto?.id) {
+      return res.status(404).json({
+        error: 'Produto não encontrado no Bling com esse SKU. Importe a planilha primeiro.'
+      });
+    }
+
+    // 2) lista campos customizados e monta mapa nome -> id
+    const listaCamposRes = await blingRequest(
+      'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309'
+    );
+    const listaCampos = await listaCamposRes.json();
+    const mapaNomeId = {};
+    for (const c of (listaCampos?.data || [])) {
+      mapaNomeId[String(c.nome).trim().toLowerCase()] = c.id;
+    }
+
+    // 3) monta payload camposCustomizados
+    const camposPayload = [];
+    const naoEncontrados = [];
+
+    for (const item of campos) {
+      const nome = String(item.nome || '').trim();
+      const valor = String(item.valor || '').trim();
+      if (!nome || !valor) continue;
+
+      const idCampo = mapaNomeId[nome.toLowerCase()];
+      if (!idCampo) {
+        naoEncontrados.push(nome);
+        continue;
+      }
+
+      // tenta pegar opções (lista)
+      let idValor = null;
+      try {
+        const detRes = await blingRequest(
+          `https://www.bling.com.br/Api/v3/campos-customizados/${idCampo}`
+        );
+        const det = await detRes.json();
+        const opcoes = det?.data?.opcoes || [];
+        if (opcoes.length) {
+          const op = opcoes.find(
+            o => String(o.nome).trim().toLowerCase() === valor.toLowerCase()
+          );
+          if (op && op.id) idValor = op.id;
+        }
+      } catch (e) {
+        console.log('Sem opções para', nome);
+      }
+
+      if (idValor) {
+        camposPayload.push({
+          idCampoCustomizado: idCampo,
+          idValorCampoCustomizado: idValor
+        });
+      } else {
+        // campo texto livre
+        camposPayload.push({
+          idCampoCustomizado: idCampo,
+          valor: valor
+        });
+      }
+    }
+
+    if (!camposPayload.length) {
+      return res.status(400).json({
+        error: 'Nenhum campo válido para enviar',
+        naoEncontrados
+      });
+    }
+
+    // 4) atualiza produto
+    const putRes = await blingRequest(
+      `https://www.bling.com.br/Api/v3/produtos/${produto.id}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({
+          camposCustomizados: camposPayload
+        })
+      }
+    );
+    const putData = await putRes.json();
+
+    if (!putRes.ok) {
+      console.error('Erro PUT produto:', putData);
+      return res.status(putRes.status).json({
+        error: putData?.error?.message || 'Falha ao atualizar produto no Bling',
+        detalhe: putData
+      });
+    }
+
+    res.json({
+      success: true,
+      produtoId: produto.id,
+      enviados: camposPayload.length,
+      naoEncontrados
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
