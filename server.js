@@ -322,7 +322,9 @@ app.get('/teste-campos', async (req, res) => {
   try {
     let token = accessToken || process.env.BLING_ACCESS_TOKEN;
 
-    let r = await fetch('https://www.bling.com.br/Api/v3/campos-customizados/modulos', {
+    const url = 'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309';
+
+    let r = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/json'
@@ -331,11 +333,9 @@ app.get('/teste-campos', async (req, res) => {
 
     if (r.status === 401) {
       const ok = await refreshBlingToken();
-      if (!ok) {
-        return res.status(401).json({ error: 'Token expirado e refresh falhou' });
-      }
+      if (!ok) return res.status(401).json({ error: 'Token expirado e refresh falhou' });
       token = accessToken;
-      r = await fetch('https://www.bling.com.br/Api/v3/campos-customizados/modulos', {
+      r = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: 'application/json'
