@@ -408,7 +408,42 @@ function renderCamposCustomizados() {
     </div>
   `).join('');
 }
+async function enviarCamposBling() {
+  const codigoPai = document.getElementById('codigoPai').value.trim();
+  if (!codigoPai) {
+    mostrarStatus('Preencha o SKU base (código pai).', 'erro', 'statusCampos');
+    return;
+  }
+  if (!camposCustomizados.length) {
+    mostrarStatus('Preencha os campos com IA antes de enviar.', 'erro', 'statusCampos');
+    return;
+  }
 
+  const preenchidos = camposCustomizados.filter(c => c.valor && String(c.valor).trim());
+  if (!preenchidos.length) {
+    mostrarStatus('Nenhum campo com valor para enviar.', 'erro', 'statusCampos');
+    return;
+  }
+
+  mostrarStatus('Enviando campos customizados para o Bling...', 'carregando', 'statusCampos');
+  try {
+    const res = await fetch('/enviar-campos-bling', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ codigoPai, campos: preenchidos })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    let msg = `✅ ${data.enviados} campo(s) enviados pro produto ID ${data.produtoId}`;
+    if (data.naoEncontrados?.length) {
+      msg += `<br>Não achou no Bling: ${data.naoEncontrados.join(', ')}`;
+    }
+    mostrarStatus(msg, 'sucesso', 'statusCampos');
+  } catch (err) {
+    mostrarStatus('Erro ao enviar: ' + err.message, 'erro', 'statusCampos');
+  }
+}
 function getCamposCustomTexto() {
   return camposCustomizados
     .filter(c => c.valor && String(c.valor).trim())
