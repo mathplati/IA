@@ -1,0 +1,288 @@
+{
+  "regras_gerais": {
+    "modelo": "sempre o código/número que está no título",
+    "tamanho": "NUNCA preencher (nenhum campo de tamanho em nenhuma categoria)",
+    "produto_personalizado": "sempre Não (quando o campo existir)",
+    "pais_origem": "sempre Brasil (quando for preencher)",
+    "marca_shopee": "NUNCA preencher",
+    "se_ia_nao_souber": "deixar vazio"
+  },
+
+  "categorias": {
+
+    "Acess Inf>Vestuário de Chuva>Galochas SHOPEE": {
+      "Marca": "ia_titulo",
+      "Marca 3": "vazio"
+    },
+
+    "Bolsa feminina ML Shopee e Shein": {
+      "Marca Bolsa": "ia_titulo",
+      "Modelo Bolsa": "codigo_titulo",
+      "País de Origem Bolsa": "Brasil",
+      "Material Bolsa": "ia_pesquisa",
+      "Estilo da Bolsa Bolsa": "vazio",
+      "Tamanho Bolsa": "ia",
+      "Cor Bolsa": "cores_anuncio",
+      "Tipo de Estilo Bolsa": "vazio",
+      "Tipo de bolsa Bolsa": "vazio"
+    },
+
+    "Bota Masculina ML, Shopee": {
+      "Marca Bota Masculina": "ia_titulo",
+      "Modelo Bota Masculina": "codigo_titulo",
+      "Gênero Bota Masculina": "Masculino",
+      "País de Origem Bota Masculina": "Brasil",
+      "Material Bota Masculina": "ia_pesquisa",
+      "Estações do ano Bota Masculina": "ia",
+      "Altura da Botas Bota Masculina": "ia"
+    },
+
+    "Bota masculina Shopee": {
+      "Marca bota": "vazio"
+    },
+
+    "Botas": {
+      "preencher": "nunca"
+    },
+
+    "Botas Femininas ML, Amazon Shopee Shein": {
+      "Marca ML Botas": "ia_titulo",
+      "Modelo ML Botas": "codigo_titulo",
+      "Gênero ML Botas": "ia",
+      "Modelo alfanumérico": "ia",
+      "Estilo do calçado bota": "ia",
+      "Tipo de cano bota": "ia",
+      "Tipo de salto Bota": "ia",
+      "Nível do salto Bota": "ia",
+      "Temporada de lançamento Bota": "ia",
+      "Marca Bota Shopee": "nunca",
+      "País de Origem Bota Shopee 1": "Brasil",
+      "Material Bota Shopee 1": "ia_pesquisa",
+      "Altura da Botas Bota Shopee 1": "ia",
+      "Tamanho Bota Shein": "nunca",
+      "Cor Bota Shein": "nunca",
+      "Salto Bota Shein": "nunca"
+    },
+
+    "Calçados de Menino > Sandálias SHOPEE e Shein": {
+      "preencher": "ia",
+      "Produto personalizado Sandália Menino": "Não",
+      "Tamanho 20": "nunca"
+    },
+
+    "Calçados, Roupas e Bolsas Calçados Alpargata": {
+      "Marca": "ia_titulo",
+      "Gênero": "ia",
+      "Modelo": "codigo_titulo"
+    },
+
+    "Chinelos Femininos Shoppe, Shien, ML": {
+      "Marca Chinelo Feminino": "ia_titulo",
+      "Modelo Chinelo Feminino": "codigo_titulo",
+      "Gênero Chinelo Feminino": "Feminino",
+      "Tipo de calçado Chinelo Feminino": "ia",
+      "Estilo do calçado Chinelo Feminino": "Casual",
+      "Tipo da embalagem do vendor Chinelo Feminino": "com embalagem adicional",
+      "País de Origem Chinelo Feminino": "Brasil",
+      "Material Chinelo Feminino": "ia_pesquisa",
+      "Produto personalizado Chinelo Feminino": "Não",
+      "Altura dos Saltos Chinelo Feminino": "ia"
+    },
+
+    "ESP. At Calç Esport, Chuteira de Futsal SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "Esportes e Fitness Futebol Roupas Chuteiras ML": {
+      "preencher": "nunca"
+    },
+
+    "Infantil > Menina > Chinelos SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "ML Calçados, Roupas e Bolsas Calçados": {
+      "preencher": "nunca"
+    },
+
+    "Moda Infantil > Menino > Chinelos SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "Moda Infantil > Calçados Menino > Botas SHOPPE": {
+      "preencher": "nunca"
+    },
+
+    "Moda Infantil Calçados de Menina Botas SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "Saltos, Tamancos ML,SHEIN, SHOPEE": {
+      "Marca": "ia_titulo",
+      "Gênero": "ia",
+      "Modelo": "codigo_titulo",
+      "Cor principal": "ia",
+      "Tipo de calçado 02": "ia",
+      "Estilo do calçado": "Casual",
+      "Cor 04": "ia",
+      "Tamanho 09": "nunca",
+      "Salto": "ia",
+      "Tipo Shein": "nunca",
+      "País de Origem Shopee 04": "Brasil",
+      "Material Shopee 04": "nunca",
+      "Ocasião Shopee 04": "Casual",
+      "Tipo da embalagem do vendor Salto": "ia"
+    },
+
+    "sandália menina infantil SHOPPE, SHEIN, ML": {
+      "Marca": "ia_titulo",
+      "Gênero": "ia",
+      "Tamanho INFANTIL": "nunca",
+      "Cor infantil": "ia",
+      "Marca Infantil": "ia",
+      "País de Origem Infantil": "Brasil",
+      "Material Infantil": "ia_se_certeza",
+      "Tipos de Cintos Infantil": "ia_se_certeza",
+      "Marca ML Infantil": "ia_titulo",
+      "Modelo ML Infantil": "codigo_titulo",
+      "Gênero ML Infantil": "ia",
+      "Tipo de calçado ML Infantil": "ia",
+      "Estilo do calçado ML Infantil": "ia",
+      "Tipo da embalagem do ML Infantil": "ia"
+    },
+
+    "Sandália Papete ortopédica ML, Shopee, Shein": {
+      "Marca 001": "ia",
+      "Marca papete": "ia_titulo",
+      "Modelo papete": "codigo_titulo",
+      "Gênero papete": "ia",
+      "Tipo de calçado papete": "ia",
+      "Estilo do calçado papete": "ia",
+      "Tipo da embalagem do vendor papete": "ia",
+      "País de Origem papete": "Brasil",
+      "Material papete": "ia_pesquisa",
+      "Produto personalizado papete": "Não",
+      "Tamanho Papete": "nunca",
+      "Cor Papete": "ia"
+    },
+
+    "Sandália Plana SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "Sandálias e Chinelos": {
+      "preencher": "nunca"
+    },
+
+    "Sandálias e Chinelos > Sandália Ergométrica Shopee": {
+      "preencher": "nunca"
+    },
+
+    "Sandálias masculina Shopee": {
+      "preencher": "nunca"
+    },
+
+    "Sapatilhas Femininas ML Shein Shopee": {
+      "Marca sapatilha ML": "ia_titulo",
+      "Modelo sapatilha ML": "codigo_titulo",
+      "Gênero sapatilha ML": "Feminino",
+      "Ocasião Shein 3": "ia",
+      "Tamanho Shein 3": "nunca",
+      "Cor Shein 3": "ia",
+      "Marca Shopee 02": "nunca",
+      "País de Origem Shopee 02": "Brasil",
+      "Material Shopee 02": "ia_pesquisa",
+      "Ocasião Shopee 02": "ia"
+    },
+
+    "Sapato feminino Shopee": {
+      "preencher": "nunca"
+    },
+
+    "Sapato masculino Shopee": {
+      "preencher": "nunca"
+    },
+
+    "Sapatos Femininos > Plataformas SHOPEE": {
+      "preencher": "nunca"
+    },
+
+    "Sapatos Sociais e Mocassims": {
+      "preencher": "nunca"
+    },
+
+    "Sapatos Sociais, Mocassims ML e SHEIN, SHOPPE": {
+      "Marca": "ia_titulo",
+      "Gênero": "ia",
+      "Modelo 02": "codigo_titulo",
+      "Estilo do calçado 03": "ia",
+      "Cor 07": "ia",
+      "Tamanho 11": "nunca",
+      "Tipo de calçado 05": "ia",
+      "País de Origem Shopee Mocassim": "Brasil",
+      "Material Shopee Mocassim": "ia_pesquisa",
+      "Ocasião Shopee Mocassim": "ia"
+    },
+
+    "Scarpins e plataforma ML, Amazon, Shein, Shopee": {
+      "Marca": "ia_titulo",
+      "Gênero": "Feminino",
+      "Modelo": "codigo_titulo",
+      "Cor principal": "ia",
+      "Tamanho 03": "nunca",
+      "Cor 02": "ia",
+      "Tipo de calçado 04": "ia",
+      "Tamanho Scarpin Shein": "nunca",
+      "Cor Scarpin Shein": "ia",
+      "País de origem Amazon 03": "nunca",
+      "Baterias são necessárias? Amazon 03": "nunca",
+      "Marca Shopee Scarpin": "nunca",
+      "País de Origem Shopee Scarpin": "Brasil",
+      "Material Shopee Scarpin": "ia_pesquisa",
+      "Ocasião Shopee Scarpin": "ia",
+      "Tipo da embalagem do vendor 10": "ia"
+    },
+
+    "SHEIN Sandálias de salto feminino": {
+      "preencher": "nunca"
+    },
+
+    "SHOPEE Sapatos fem Slip ons, Mary Janes e Mules": {
+      "preencher": "nunca"
+    },
+
+    "Tenis Masculino ML, Shopee, Shein": {
+      "Marca tenis masculino": "ia_titulo",
+      "Modelo tenis masculino": "codigo_titulo",
+      "Gênero tenis masculino": "Masculino",
+      "Tipo da embalagem do vendor tenis masculino": "ia",
+      "Entrada (tensão) tenis masculino": "vazio",
+      "Tamanho tenis masculino": "nunca",
+      "Cor tenis masculino": "ia",
+      "Características do produto tenis masculino": "vazio",
+      "País de Origem tenis masculino": "Brasil",
+      "Altura dos Saltos tenis masculino": "ia",
+      "Ajuste amplo tenis masculino": "ia",
+      "Produto personalizado tenis masculino": "Não"
+    },
+
+    "Tênis Feminino Mercadolivre Amazon Shein Shopee": {
+      "Marca": "ia_titulo",
+      "Gênero": "Feminino",
+      "Modelo": "codigo_titulo",
+      "Cor principal": "ia",
+      "Estilo": "ia",
+      "Características do produto 03": "vazio",
+      "Tamanho.": "nunca",
+      "Cor.": "ia",
+      "País de origem Amazon": "nunca",
+      "Marca tenis Shopee 02": "nunca",
+      "País de Origem tenis Shopee 02": "Brasil",
+      "Altura dos Saltos tenis Shopee 02": "ia",
+      "Ajuste amplo tenis Shopee 02": "ia",
+      "Número do modelo Tenis amazon": "nunca",
+      "Modelo alfanumérico ML": "ia",
+      "Tipo de largura ML": "ia"
+    }
+  }
+}
