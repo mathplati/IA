@@ -145,18 +145,23 @@
 
     <!-- 5. CAMPOS CUSTOMIZADOS -->
     <section class="card">
-      <h2>5. Campos customizados Bling</h2>
-      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px">
-        Usa a categoria + título + cores e aplica as regras definidas. Revise antes de gerar a planilha.
-      </p>
-      <button type="button" class="btn primary" onclick="preencherCamposCustomizados()">
-        Preencher campos com IA
-      </button>
-      <div id="statusCampos" class="status" style="margin-top:12px"></div>
-      <div id="camposCustomBox" style="display:none;margin-top:16px">
-        <div class="form-grid" id="listaCamposCustom"></div>
-      </div>
-    </section>
+  <h2>5. Campos customizados Bling</h2>
+  <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px">
+    1) Preenche com IA → 2) Importa a planilha no Bling → 3) Envia os campos pela API
+  </p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+    <button type="button" class="btn primary" onclick="preencherCamposCustomizados()">
+      Preencher campos com IA
+    </button>
+    <button type="button" class="btn secondary" onclick="enviarCamposBling()">
+      Enviar campos pro Bling
+    </button>
+  </div>
+  <div id="statusCampos" class="status"></div>
+  <div id="camposCustomBox" style="display:none;margin-top:16px">
+    <div class="form-grid" id="listaCamposCustom"></div>
+  </div>
+</section>
 
     <!-- 6. PLANILHA -->
     <section class="card">
