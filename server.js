@@ -318,7 +318,37 @@ Aqui você encontra desde os clássicos até os lançamentos das marcas mais que
     res.status(500).json({ error: err.message });
   }
 });
+app.get('/teste-campos', async (req, res) => {
+  try {
+    let token = accessToken || process.env.BLING_ACCESS_TOKEN;
 
+    let r = await fetch('https://www.bling.com.br/Api/v3/campos-customizados/modulos', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    });
+
+    if (r.status === 401) {
+      const ok = await refreshBlingToken();
+      if (!ok) {
+        return res.status(401).json({ error: 'Token expirado e refresh falhou' });
+      }
+      token = accessToken;
+      r = await fetch('https://www.bling.com.br/Api/v3/campos-customizados/modulos', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: 'application/json'
+        }
+      });
+    }
+
+    const data = await r.json();
+    res.json({ status: r.status, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 function limparFinalDescricao(texto) {
   if (!texto) return '';
   // Remove finais antigos genéricos para não duplicar
