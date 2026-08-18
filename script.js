@@ -474,7 +474,7 @@ async function gerarExcel() {
           '', 'Mercadoria para Revenda', '', '0',
           codigoPai, '0', '', '', '28.059.00', '1',
           descricao, '0', fotosCor, '',
-          '0', 'Não', 'NOVO',
+          '0', 'Sim', 'NOVO',
           'NÃO', '', '', departamento, 'Centímetro',
           '0', '0', '0',
           '0', categoria, ''
