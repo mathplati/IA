@@ -322,8 +322,7 @@ app.get('/teste-campos', async (req, res) => {
   try {
     let token = accessToken || process.env.BLING_ACCESS_TOKEN;
 
-    const url = 'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309';
-
+    const url = 'https://www.bling.com.br/Api/v3/campos-customizados/1964456';
     let r = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
