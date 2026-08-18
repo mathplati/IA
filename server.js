@@ -420,7 +420,15 @@ app.post('/enviar-campos-bling', async (req, res) => {
     if (!codigoPai) return res.status(400).json({ error: 'codigoPai obrigatório' });
     if (!campos.length) return res.status(400).json({ error: 'Nenhum campo para enviar' });
 
-    // 1) busca produto pelo código
+    function normalizar(s) {
+      return String(s || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
+    // 1) busca produto
     const busca = await blingRequest(
       `https://www.bling.com.br/Api/v3/produtos?codigo=${encodeURIComponent(codigoPai)}`
     );
@@ -432,6 +440,112 @@ app.post('/enviar-campos-bling', async (req, res) => {
       });
     }
 
+    // 2) lista campos Bling
+    const listaCamposRes = await blingRequest(
+      'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309'
+    );
+    const listaCampos = await listaCamposRes.json();
+    const camposBling = listaCampos?.data || [];
+
+    // mapa: nome normalizado -> { id, nomeOriginal }
+    const mapa = {};
+    for (const c of camposBling) {
+      mapa[normalizar(c.nome)] = { id: c.id, nome: c.nome };
+    }
+
+    const camposPayload = [];
+    const naoEncontrados = [];
+    const enviadosDebug = [];
+
+    for (const item of campos) {
+      const nome = String(item.nome || '').trim();
+      const valor = String(item.valor || '').trim();
+      if (!nome || !valor) continue;
+
+      const key = normalizar(nome);
+      let match = mapa[key];
+
+      // fallback: contém
+      if (!match) {
+        const key2 = Object.keys(mapa).find(k => k.includes(key) || key.includes(k));
+        if (key2) match = mapa[key2];
+      }
+
+      if (!match) {
+        naoEncontrados.push(nome);
+        continue;
+      }
+
+      let idValor = null;
+      try {
+        const detRes = await blingRequest(
+          `https://www.bling.com.br/Api/v3/campos-customizados/${match.id}`
+        );
+        const det = await detRes.json();
+        const opcoes = det?.data?.opcoes || [];
+        if (opcoes.length) {
+          const valorN = normalizar(valor);
+          const op = opcoes.find(o => normalizar(o.nome) === valorN)
+            || opcoes.find(o => normalizar(o.nome).includes(valorN) || valorN.includes(normalizar(o.nome)));
+          if (op && op.id) idValor = op.id;
+        }
+      } catch (e) {
+        console.log('Sem opções para', match.nome);
+      }
+
+      if (idValor) {
+        camposPayload.push({
+          idCampoCustomizado: match.id,
+          idValorCampoCustomizado: idValor
+        });
+        enviadosDebug.push({ nome: match.nome, valor, tipo: 'lista', idValor });
+      } else {
+        camposPayload.push({
+          idCampoCustomizado: match.id,
+          valor: valor
+        });
+        enviadosDebug.push({ nome: match.nome, valor, tipo: 'texto' });
+      }
+    }
+
+    if (!camposPayload.length) {
+      return res.status(400).json({
+        error: 'Nenhum campo válido para enviar',
+        naoEncontrados,
+        dica: 'Os nomes do site não bateram com os nomes no Bling. Veja a lista naoEncontrados.'
+      });
+    }
+
+    const putRes = await blingRequest(
+      `https://www.bling.com.br/Api/v3/produtos/${produto.id}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ camposCustomizados: camposPayload })
+      }
+    );
+    const putData = await putRes.json();
+
+    if (!putRes.ok) {
+      console.error('Erro PUT produto:', putData);
+      return res.status(putRes.status).json({
+        error: putData?.error?.message || 'Falha ao atualizar produto no Bling',
+        detalhe: putData,
+        enviadosDebug
+      });
+    }
+
+    res.json({
+      success: true,
+      produtoId: produto.id,
+      enviados: camposPayload.length,
+      naoEncontrados,
+      enviadosDebug
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
     // 2) lista campos customizados e monta mapa nome -> id
     const listaCamposRes = await blingRequest(
       'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309'
