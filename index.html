@@ -12,175 +12,188 @@
   <div class="container">
     <header>
       <h1>Gerador de Anúncios Bling</h1>
-      <p>Gere uma planilha pronta com variações, estoque e fotos em menos de um minuto!</p>
+      <p>Produto → variações → fotos → planilha pronta</p>
     </header>
 
-    <!-- 1. DADOS -->
-    <section class="card">
-      <h2>1. Dados do Produto</h2>
-      <div class="form-grid">
-        <div class="field">
-          <label>Título base / Nome do produto *</label>
-          <input type="text" id="tituloBase" placeholder="Ex: Sandália Papete Beira Rio 8524.110" />
-        </div>
-        <div class="field">
-          <label>SKU base (código pai) *</label>
-          <input type="text" id="codigoPai" placeholder="Ex: 8524.110-L4" />
-        </div>
-        <div class="field">
-          <label>Preço (R$) *</label>
-          <input type="number" id="preco" step="0.01" placeholder="109.90" />
-        </div>
-        <div class="field">
-          <label>NCM</label>
-          <select id="ncm">
-            <option value="6402.99.90">6402.99.90 — Sandálias etc</option>
-            <option value="6402.20.00">6402.20.00 — Chinelos</option>
-            <option value="6402.91.90">6402.91.90 — Botas</option>
-            <option value="4202.21.00">4202.21.00 — Bolsas</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Categoria</label>
-          <select id="categoria">
-            <option value="">Sem categoria</option>
-            <option>Acess Inf>Vestuário de Chuva>Galochas SHOPEE</option>
-            <option>Bolsa feminina ML Shopee e Shein</option>
-            <option>Bota Masculina ML, Shopee</option>
-            <option>Bota masculina Shopee</option>
-            <option>Botas</option>
-            <option>Botas Femininas ML, Amazon Shopee Shein</option>
-            <option>Calçados de Menino > Sandálias SHOPEE e Shein</option>
-            <option>Calçados, Roupas e Bolsas Calçados Alpargata</option>
-            <option>Chinelos Femininos Shoppe, Shien, ML</option>
-            <option>Chinelos masculino Shoppe, Shien, ML</option>
-            <option>ESP. At Calç Esport, Chuteira de Futsal SHOPEE</option>
-            <option>Esportes e Fitness Futebol Roupas Chuteiras ML</option>
-            <option>Infantil > Menina > Chinelos SHOPEE</option>
-            <option>ML Calçados, Roupas e Bolsas Calçados</option>
-            <option>Moda Infantil > Menino > Chinelos SHOPEE</option>
-            <option>Moda Infantil > Calçados Menino > Botas SHOPPE</option>
-            <option>Moda Infantil Calçados de Menina Botas SHOPEE</option>
-            <option>Saltos, Tamancos ML,SHEIN, SHOPEE</option>
-            <option>sandália menina infantil SHOPPE, SHEIN, ML</option>
-            <option>Sandália Papete ortopédica ML, Shopee, Shein</option>
-            <option>Sandália Plana SHOPEE</option>
-            <option>Sandálias e Chinelos</option>
-            <option>Sandálias e Chinelos > Sandália Ergométrica Shopee</option>
-            <option>Sandálias masculina Shopee</option>
-            <option>Sapatilhas Femininas ML Shein Shopee</option>
-            <option>Sapato feminino Shopee</option>
-            <option>Sapato masculino Shopee</option>
-            <option>Sapatos Femininos > Plataformas SHOPEE</option>
-            <option>Sapatos Sociais e Mocassims</option>
-            <option>Sapatos Sociais, Mocassims ML e SHEIN, SHOPPE</option>
-            <option>Scarpins e plataforma ML, Amazon, Shein, Shopee</option>
-            <option>SHEIN Sandálias de salto feminino</option>
-            <option>SHOPEE Sapatos fem Slip ons, Mary Janes e Mules</option>
-            <option>Tenis Masculino ML, Shopee, Shein</option>
-            <option>Tênis Feminino Mercadolivre Amazon Shein Shopee</option>
-          </select>
-        </div>
+    <!-- 1 -->
+    <section class="card open" id="step1">
+      <div class="card-header" onclick="toggleCard('step1')">
+        <h2><span class="step-num">1</span> Dados do produto</h2>
+        <span class="chevron">▾</span>
       </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>Título base *</label>
+            <input type="text" id="tituloBase" placeholder="Sandália Papete Beira Rio 8524.110" />
+          </div>
+          <div class="field">
+            <label>SKU base (pai) *</label>
+            <input type="text" id="codigoPai" placeholder="8524.110-L4" />
+          </div>
+          <div class="field">
+            <label>Preço (R$) *</label>
+            <input type="number" id="preco" step="0.01" placeholder="109.90" />
+          </div>
+          <div class="field">
+            <label>NCM</label>
+            <select id="ncm">
+              <option value="6402.99.90">6402.99.90 — Sandálias</option>
+              <option value="6402.20.00">6402.20.00 — Chinelos</option>
+              <option value="6402.91.90">6402.91.90 — Botas</option>
+              <option value="4202.21.00">4202.21.00 — Bolsas</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column: 1 / -1">
+            <label>Categoria</label>
+            <select id="categoria">
+              <option value="">Sem categoria</option>
+              <option>Acess Inf>Vestuário de Chuva>Galochas SHOPEE</option>
+              <option>Bolsa feminina ML Shopee e Shein</option>
+              <option>Bota Masculina ML, Shopee</option>
+              <option>Bota masculina Shopee</option>
+              <option>Botas</option>
+              <option>Botas Femininas ML, Amazon Shopee Shein</option>
+              <option>Calçados de Menino > Sandálias SHOPEE e Shein</option>
+              <option>Calçados, Roupas e Bolsas Calçados Alpargata</option>
+              <option>Chinelos Femininos Shoppe, Shien, ML</option>
+              <option>Chinelos masculino Shoppe, Shien, ML</option>
+              <option>ESP. At Calç Esport, Chuteira de Futsal SHOPEE</option>
+              <option>Esportes e Fitness Futebol Roupas Chuteiras ML</option>
+              <option>Infantil > Menina > Chinelos SHOPEE</option>
+              <option>ML Calçados, Roupas e Bolsas Calçados</option>
+              <option>Moda Infantil > Menino > Chinelos SHOPEE</option>
+              <option>Moda Infantil > Calçados Menino > Botas SHOPPE</option>
+              <option>Moda Infantil Calçados de Menina Botas SHOPEE</option>
+              <option>Saltos, Tamancos ML,SHEIN, SHOPEE</option>
+              <option>sandália menina infantil SHOPPE, SHEIN, ML</option>
+              <option>Sandália Papete ortopédica ML, Shopee, Shein</option>
+              <option>Sandália Plana SHOPEE</option>
+              <option>Sandálias e Chinelos</option>
+              <option>Sandálias e Chinelos > Sandália Ergométrica Shopee</option>
+              <option>Sandálias masculina Shopee</option>
+              <option>Sapatilhas Femininas ML Shein Shopee</option>
+              <option>Sapato feminino Shopee</option>
+              <option>Sapato masculino Shopee</option>
+              <option>Sapatos Femininos > Plataformas SHOPEE</option>
+              <option>Sapatos Sociais e Mocassims</option>
+              <option>Sapatos Sociais, Mocassims ML e SHEIN, SHOPPE</option>
+              <option>Scarpins e plataforma ML, Amazon, Shein, Shopee</option>
+              <option>SHEIN Sandálias de salto feminino</option>
+              <option>SHOPEE Sapatos fem Slip ons, Mary Janes e Mules</option>
+              <option>Tenis Masculino ML, Shopee, Shein</option>
+              <option>Tênis Feminino Mercadolivre Amazon Shein Shopee</option>
+            </select>
+          </div>
+        </div>
 
-      <button type="button" id="btnDimensoes" class="btn-dimensoes incompleto" onclick="abrirModalDimensoes()">
-        Ver peso e dimensões
-      </button>
+        <button type="button" id="btnDimensoes" class="btn-dimensoes incompleto" onclick="abrirModalDimensoes()">
+          Ver peso e dimensões
+        </button>
 
-      <div class="field">
-        <label>Tipo de grade de tamanho</label>
-        <select id="tipoTamanho">
-          <option value="mulher">Mulher (33-40)</option>
-          <option value="homem">Homem (37-45)</option>
-          <option value="adolescente">Adolescente (26-33)</option>
-          <option value="infantil">Infantil (17-26)</option>
-          <option value="havaianas-infantil">Havaianas Infantil</option>
-          <option value="custom">Personalizado</option>
-        </select>
-      </div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Grade de tamanho</label>
+            <select id="tipoTamanho">
+              <option value="mulher">Mulher (33–40)</option>
+              <option value="homem">Homem (37–45)</option>
+              <option value="adolescente">Adolescente (26–33)</option>
+              <option value="infantil">Infantil (17–26)</option>
+              <option value="havaianas-infantil">Havaianas Infantil</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <div class="field" id="tamanhosCustomWrap" style="display:none">
+            <label>Tamanhos (vírgula)</label>
+            <input type="text" id="tamanhosCustom" placeholder="34,35,36,37" />
+          </div>
+        </div>
 
-      <div class="field" id="tamanhosCustomWrap" style="display:none">
-        <label>Tamanhos (separados por vírgula)</label>
-        <input type="text" id="tamanhosCustom" placeholder="34,35,36,37,38,39" />
-      </div>
-
-      <div class="field">
-        <label>Estoque por tamanho e cor (0 a 100)</label>
-        <div id="listaEstoques"></div>
+        <div class="field">
+          <label>Estoque por tamanho e cor</label>
+          <div id="listaEstoques"></div>
+        </div>
       </div>
     </section>
 
-    <!-- 2. CORES -->
-    <section class="card">
-      <h2>2. Cores e SKUs</h2>
-      <div id="listaCores"></div>
-      <button type="button" class="btn secondary" onclick="adicionarCor()">+ Adicionar cor</button>
+    <!-- 2 -->
+    <section class="card" id="step2">
+      <div class="card-header" onclick="toggleCard('step2')">
+        <h2><span class="step-num">2</span> Cores e SKUs</h2>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="card-body">
+        <div id="listaCores"></div>
+        <button type="button" class="btn secondary" onclick="adicionarCor()">+ Adicionar cor</button>
+      </div>
     </section>
 
-    <!-- 3. FOTOS -->
-    <section class="card">
-      <h2>3. Fotos por Cor</h2>
-      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px">
-        A <strong>primeira cor</strong> define as fotos do produto pai. Cada cor tem até 4 fotos.
-      </p>
-      <div id="fotosPorCor"></div>
+    <!-- 3 -->
+    <section class="card" id="step3">
+      <div class="card-header" onclick="toggleCard('step3')">
+        <h2><span class="step-num">3</span> Fotos</h2>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="hint">Primeira cor = fotos do pai. Até 4 por cor.</p>
+        <div id="fotosPorCor"></div>
+      </div>
     </section>
 
-    <!-- 4. IA TÍTULOS -->
-    <section class="card">
-      <h2>4. Gerar Títulos e Descrições (IA)</h2>
-      <button type="button" class="btn primary" onclick="gerarConteudo()">Gerar com Grok</button>
-      <div id="resultadoIA" class="resultado-ia" style="display:none">
-        <div class="field">
-          <label>Escolha o título</label>
-          <div id="opcoesTitulos"></div>
+    <!-- 4 -->
+    <section class="card" id="step4">
+      <div class="card-header" onclick="toggleCard('step4')">
+        <h2><span class="step-num">4</span> Títulos e descrições</h2>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="card-body">
+        <button type="button" class="btn primary" onclick="gerarConteudo()">Gerar com Grok</button>
+        <div id="resultadoIA" class="resultado-ia" style="display:none;margin-top:14px">
+          <div class="field">
+            <label>Título</label>
+            <div id="opcoesTitulos"></div>
+          </div>
+          <div class="field">
+            <label>Descrição</label>
+            <div id="opcoesDescricoes"></div>
+          </div>
         </div>
-        <div class="field">
-          <label>Escolha a descrição</label>
-          <div id="opcoesDescricoes"></div>
+        <div id="statusIA" class="status"></div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="card" id="step5">
+      <div class="card-header" onclick="toggleCard('step5')">
+        <h2><span class="step-num">5</span> Campos customizados</h2>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="card-body">
+        <p class="hint">IA preenche → importa planilha → envia campos pro Bling</p>
+        <div class="btn-row">
+          <button type="button" class="btn primary" onclick="preencherCamposCustomizados()">Preencher com IA</button>
+          <button type="button" class="btn secondary" onclick="enviarCamposBling()">Enviar pro Bling</button>
+        </div>
+        <div id="statusCampos" class="status"></div>
+        <div id="camposCustomBox" style="display:none;margin-top:14px">
+          <div class="form-grid" id="listaCamposCustom"></div>
         </div>
       </div>
-      <div id="statusIA" class="status"></div>
     </section>
 
-    <!-- 5. CAMPOS CUSTOMIZADOS -->
-    <section class="card">
-  <h2>5. Campos customizados Bling</h2>
-  <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px">
-    1) Preenche com IA → 2) Importa a planilha no Bling → 3) Envia os campos pela API
-  </p>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-    <button type="button" class="btn primary" onclick="preencherCamposCustomizados()">
-      Preencher campos com IA
-    </button>
-    <button type="button" class="btn secondary" onclick="enviarCamposBling()">
-      Enviar campos pro Bling
-    </button>
+    <!-- ações finais -->
+    <div class="sticky-actions">
+      <button type="button" class="btn secondary" onclick="gerarExcel()">Baixar planilha</button>
+      <button type="button" class="btn primary" onclick="gerarExcel()">Finalizar e baixar</button>
+    </div>
+    <div id="status" class="status"></div>
   </div>
-  <div id="statusCampos" class="status"></div>
-  <div id="camposCustomBox" style="display:none;margin-top:16px">
-    <div class="form-grid" id="listaCamposCustom"></div>
-  </div>
-</section>
 
-    <!-- 6. PLANILHA -->
-    <section class="card">
-      <h2>6. Baixar Planilha</h2>
-      <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">
-        Gera o Excel no modelo oficial do Bling, com pai, variações, estoque, SKUs, fotos e campos customizados.
-      </p>
-      <div class="botoes-acao">
-        <button type="button" class="btn primary" onclick="gerarExcel()">Baixar Planilha Bling</button>
-      </div>
-      <div id="status" class="status"></div>
-    </section>
-  </div>
-
-  <!-- MODAL PESO E DIMENSÕES -->
+  <!-- modal dimensões -->
   <div id="modalDimensoes" class="modal-overlay" style="display:none">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Peso e Dimensões</h3>
+        <h3>Peso e dimensões</h3>
         <button type="button" class="modal-close" onclick="fecharModalDimensoes()">×</button>
       </div>
       <div class="modal-body">
@@ -214,5 +227,11 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function toggleCard(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('open');
+    }
+  </script>
 </body>
 </html>
