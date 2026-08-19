@@ -467,6 +467,7 @@ async function uploadFotosCor(arquivos) {
 async function gerarExcel() {
   const nome = tituloSelecionado || document.getElementById('tituloBase').value.trim();
   const codigoPai = document.getElementById('codigoPai').value.trim();
+  const preco = document.getElementById('preco').value;
   const precoFmt = String(preco).replace('.', ',');
   const descricao = descricaoSelecionada || '';
   const categoria = document.getElementById('categoria').value || '';
@@ -482,7 +483,6 @@ async function gerarExcel() {
     mostrarStatus('Preencha os dados antes de gerar o Excel.', 'erro');
     return;
   }
-
   try {
     mostrarStatus('Processando fotos (PhotoRoom) e gerando planilha...', 'carregando');
     const coresComUrls = [];
@@ -516,7 +516,7 @@ async function gerarExcel() {
     const fotosPai = (coresComUrls[0]?.fotosUrls || []).join('|');
 
     rows.push([
-      '', codigoPai, nome, 'UN', ncm, '0', preco, '0',
+      '', codigoPai, nome, 'UN', ncm, '0', precoFmt, '0',
       '', 'Ativo', '0', '0', '',
       '', '', '0', '0', String(dim.pesoLiquido).replace('.', ','),
       String(dim.pesoBruto).replace('.', ','), '', '', String(dim.largura).replace('.', ','),
@@ -545,7 +545,7 @@ async function gerarExcel() {
           : 0;
 
         rows.push([
-          '', codigoVar, nomeVar, 'UN', ncm, '0', preco, '0',
+          '', codigoVar, nomeVar, 'UN', ncm, '0', precoFmt, '0',
           '', 'Ativo', String(estoque), '0', '',
           '', '', '0', '0', String(dim.pesoLiquido).replace('.', ','),
           String(dim.pesoBruto).replace('.', ','), '', '', String(dim.largura).replace('.', ','),
