@@ -113,6 +113,11 @@
           <label>Estoque por tamanho e cor</label>
           <div id="listaEstoques"></div>
         </div>
+
+        <div class="nav-passo">
+          <span></span>
+          <button type="button" class="btn primary" onclick="continuarPasso('step1')">Continuar</button>
+        </div>
       </div>
     </section>
 
@@ -125,6 +130,11 @@
       <div class="card-body">
         <div id="listaCores"></div>
         <button type="button" class="btn secondary" onclick="adicionarCor()">+ Adicionar cor</button>
+
+        <div class="nav-passo">
+          <button type="button" class="btn secondary" onclick="abrirPasso('step1')">Voltar</button>
+          <button type="button" class="btn primary" onclick="continuarPasso('step2')">Continuar</button>
+        </div>
       </div>
     </section>
 
@@ -135,8 +145,13 @@
         <span class="chevron">▾</span>
       </div>
       <div class="card-body">
-        <p class="hint">Primeira cor = fotos do pai. Até 4 por cor.</p>
+        <p class="hint">Primeira cor = fotos do pai. Até 4 por cor. Pode pular.</p>
         <div id="fotosPorCor"></div>
+
+        <div class="nav-passo">
+          <button type="button" class="btn secondary" onclick="abrirPasso('step2')">Voltar</button>
+          <button type="button" class="btn primary" onclick="continuarPasso('step3')">Continuar</button>
+        </div>
       </div>
     </section>
 
@@ -159,6 +174,11 @@
           </div>
         </div>
         <div id="statusIA" class="status"></div>
+
+        <div class="nav-passo">
+          <button type="button" class="btn secondary" onclick="abrirPasso('step3')">Voltar</button>
+          <button type="button" class="btn primary" onclick="continuarPasso('step4')">Continuar</button>
+        </div>
       </div>
     </section>
 
@@ -178,10 +198,14 @@
         <div id="camposCustomBox" style="display:none;margin-top:14px">
           <div class="form-grid" id="listaCamposCustom"></div>
         </div>
+
+        <div class="nav-passo">
+          <button type="button" class="btn secondary" onclick="abrirPasso('step4')">Voltar</button>
+          <button type="button" class="btn primary" onclick="gerarExcel()">Baixar planilha</button>
+        </div>
       </div>
     </section>
 
-    <!-- ações finais -->
     <div class="sticky-actions">
       <button type="button" class="btn secondary" onclick="gerarExcel()">Baixar planilha</button>
       <button type="button" class="btn primary" onclick="gerarExcel()">Finalizar e baixar</button>
@@ -189,7 +213,6 @@
     <div id="status" class="status"></div>
   </div>
 
-  <!-- modal dimensões -->
   <div id="modalDimensoes" class="modal-overlay" style="display:none">
     <div class="modal-box">
       <div class="modal-header">
@@ -227,11 +250,5 @@
   </div>
 
   <script src="script.js"></script>
-  <script>
-    function toggleCard(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.toggle('open');
-    }
-  </script>
 </body>
 </html>
