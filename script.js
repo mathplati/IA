@@ -467,7 +467,7 @@ async function uploadFotosCor(arquivos) {
 async function gerarExcel() {
   const nome = tituloSelecionado || document.getElementById('tituloBase').value.trim();
   const codigoPai = document.getElementById('codigoPai').value.trim();
-  const preco = document.getElementById('preco').value;
+  const precoFmt = String(preco).replace('.', ',');
   const descricao = descricaoSelecionada || '';
   const categoria = document.getElementById('categoria').value || '';
   const ncm = document.getElementById('ncm').value || '6402.99.90';
