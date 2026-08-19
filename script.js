@@ -23,6 +23,8 @@ const departamentos = {
   custom: 'Feminino'
 };
 
+const passos = ['step1', 'step2', 'step3', 'step4', 'step5'];
+
 document.getElementById('tipoTamanho').addEventListener('change', () => {
   const tipo = document.getElementById('tipoTamanho').value;
   document.getElementById('tamanhosCustomWrap').style.display =
@@ -52,6 +54,7 @@ function dimensoesCompletas() {
 
 function validarDimensoes() {
   const btn = document.getElementById('btnDimensoes');
+  if (!btn) return;
   if (dimensoesCompletas()) {
     btn.classList.remove('incompleto');
     btn.classList.add('completo');
@@ -159,6 +162,7 @@ function removerCor(id) {
 
 function renderCores() {
   const container = document.getElementById('listaCores');
+  if (!container) return;
   container.innerHTML = '';
   cores.forEach((cor, index) => {
     const div = document.createElement('div');
@@ -193,6 +197,7 @@ function atualizarNomeCor(index, novoNome) {
 
 function renderFotosPorCor() {
   const container = document.getElementById('fotosPorCor');
+  if (!container) return;
   container.innerHTML = '';
   if (cores.length === 0) {
     container.innerHTML = '<p style="color:var(--muted)">Adicione uma cor primeiro.</p>';
@@ -350,12 +355,10 @@ async function preencherCamposCustomizados() {
   const tituloBase = document.getElementById('tituloBase').value.trim();
   const tipoGrade = document.getElementById('tipoTamanho').value;
   const generoHint = departamentos[tipoGrade] || '';
-
   if (!categoria) {
     mostrarStatus('Escolha a categoria primeiro.', 'erro', 'statusCampos');
     return;
   }
-
   mostrarStatus('Preenchendo campos customizados com Grok...', 'carregando', 'statusCampos');
   try {
     const res = await fetch('/preencher-campos', {
@@ -370,10 +373,8 @@ async function preencherCamposCustomizados() {
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
-
     camposCustomizados = data.campos || [];
     renderCamposCustomizados();
-
     if (data.aviso) {
       mostrarStatus(data.aviso, 'sucesso', 'statusCampos');
     } else {
@@ -392,13 +393,11 @@ function renderCamposCustomizados() {
   const box = document.getElementById('camposCustomBox');
   const lista = document.getElementById('listaCamposCustom');
   if (!box || !lista) return;
-
   if (!camposCustomizados.length) {
     box.style.display = 'none';
     lista.innerHTML = '';
     return;
   }
-
   box.style.display = 'block';
   lista.innerHTML = camposCustomizados.map((c, i) => `
     <div class="field">
@@ -427,7 +426,6 @@ async function enviarCamposBling() {
     mostrarStatus('Nenhum campo com valor para enviar.', 'erro', 'statusCampos');
     return;
   }
-
   mostrarStatus('Enviando campos customizados para o Bling...', 'carregando', 'statusCampos');
   try {
     const res = await fetch('/enviar-campos-bling', {
@@ -443,7 +441,6 @@ async function enviarCamposBling() {
       }
       throw new Error(data.error + extra);
     }
-
     let msg = `✅ ${data.enviados} campo(s) enviados pro produto ID ${data.produtoId}`;
     if (data.naoEncontrados?.length) {
       msg += `<br>Não achou no Bling: ${data.naoEncontrados.join(', ')}`;
@@ -534,122 +531,6 @@ async function gerarExcel() {
       '0', '0', '0',
       '0', categoria, infoAdicional
     ]);
-    function toggleCard(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle('open');
-}
-    const passos = ['step1', 'step2', 'step3', 'step4', 'step5'];
-
-function abrirPasso(id) {
-  passos.forEach(pid => {
-    const el = document.getElementById(pid);
-    if (!el) return;
-    if (pid === id) el.classList.add('open');
-    else el.classList.remove('open');
-  });
-  const alvo = document.getElementById(id);
-  if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function limparErros() {
-  document.querySelectorAll('.field.erro').forEach(el => el.classList.remove('erro'));
-  document.querySelectorAll('.dica-erro').forEach(el => el.remove());
-}
-
-function marcarErro(inputId, msg) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-  const field = input.closest('.field');
-  if (!field) return;
-  field.classList.add('erro');
-  const dica = document.createElement('small');
-  dica.className = 'dica-erro';
-  dica.textContent = msg;
-  field.appendChild(dica);
-}
-
-function validarPasso(stepId) {
-  limparErros();
-  const faltando = [];
-
-  if (stepId === 'step1') {
-    const titulo = document.getElementById('tituloBase').value.trim();
-    const sku = document.getElementById('codigoPai').value.trim();
-    const preco = document.getElementById('preco').value;
-    if (!titulo) {
-      faltando.push('Título base');
-      marcarErro('tituloBase', 'Ex: Sandália Papete Beira Rio 8524.110');
-    }
-    if (!sku) {
-      faltando.push('SKU base (pai)');
-      marcarErro('codigoPai', 'Ex: 8524.110-L4');
-    }
-    if (!preco || Number(preco) <= 0) {
-      faltando.push('Preço');
-      marcarErro('preco', 'Informe um preço maior que zero');
-    }
-    if (!getTamanhos().length) {
-      faltando.push('Grade de tamanho');
-      marcarErro('tipoTamanho', 'Escolha a grade ou tamanhos personalizados');
-    }
-  }
-
-  if (stepId === 'step2') {
-    const ok = cores.some(c => c.nome && c.nome.trim());
-    if (!ok) faltando.push('Pelo menos uma cor com nome');
-  }
-
-  return faltando;
-}
-
-function continuarPasso(stepAtual) {
-  const idx = passos.indexOf(stepAtual);
-  const faltando = validarPasso(stepAtual);
-
-  if (faltando.length) {
-    mostrarAvisoPasso(stepAtual, faltando, () => {
-      if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
-    });
-    return;
-  }
-
-  if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
-}
-
-function mostrarAvisoPasso(stepId, faltando, onContinuar) {
-  const body = document.querySelector(`#${stepId} .card-body`);
-  if (!body) return;
-
-  let box = document.getElementById('avisoValidacao');
-  if (box) box.remove();
-
-  box = document.createElement('div');
-  box.id = 'avisoValidacao';
-  box.className = 'aviso-validacao';
-  box.innerHTML = `
-    <strong>Faltam informações</strong>
-    <ul>${faltando.map(f => `<li>${f}</li>`).join('')}</ul>
-    <div class="btn-row">
-      <button type="button" class="btn secondary" id="btnCorrigir">Corrigir</button>
-      <button type="button" class="btn primary" id="btnSeguirMesmo">Continuar mesmo assim</button>
-    </div>
-  `;
-  body.appendChild(box);
-
-  document.getElementById('btnCorrigir').onclick = () => box.remove();
-  document.getElementById('btnSeguirMesmo').onclick = () => {
-    box.remove();
-    onContinuar();
-  };
-}
-
-function toggleCard(id) {
-  abrirPasso(id);
-}
-
-// inicia no passo 1
-abrirPasso('step1');
 
     coresComUrls.forEach(cor => {
       const fotosCor = (cor.fotosUrls || []).join('|');
@@ -699,6 +580,114 @@ abrirPasso('step1');
   }
 }
 
+/* ===== WIZARD ===== */
+function abrirPasso(id) {
+  passos.forEach(pid => {
+    const el = document.getElementById(pid);
+    if (!el) return;
+    el.classList.toggle('open', pid === id);
+  });
+  const alvo = document.getElementById(id);
+  if (alvo) {
+    setTimeout(() => {
+      alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 40);
+  }
+}
+
+function limparErros() {
+  document.querySelectorAll('.field.erro').forEach(el => el.classList.remove('erro'));
+  document.querySelectorAll('.dica-erro').forEach(el => el.remove());
+  const aviso = document.getElementById('avisoValidacao');
+  if (aviso) aviso.remove();
+}
+
+function marcarErro(inputId, msg) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const field = input.closest('.field');
+  if (!field) return;
+  field.classList.add('erro');
+  const dica = document.createElement('small');
+  dica.className = 'dica-erro';
+  dica.textContent = msg;
+  field.appendChild(dica);
+}
+
+function validarPasso(stepId) {
+  limparErros();
+  const faltando = [];
+
+  if (stepId === 'step1') {
+    if (!document.getElementById('tituloBase').value.trim()) {
+      faltando.push('Título base');
+      marcarErro('tituloBase', 'Ex: Tênis Air Jordan 1 Low');
+    }
+    if (!document.getElementById('codigoPai').value.trim()) {
+      faltando.push('SKU base');
+      marcarErro('codigoPai', 'Ex: 06036-048');
+    }
+    const preco = document.getElementById('preco').value;
+    if (!preco || Number(preco) <= 0) {
+      faltando.push('Preço');
+      marcarErro('preco', 'Informe um preço válido');
+    }
+    if (!getTamanhos().length) {
+      faltando.push('Grade de tamanho');
+      marcarErro('tipoTamanho', 'Escolha a grade');
+    }
+  }
+
+  if (stepId === 'step2') {
+    if (!cores.some(c => c.nome && c.nome.trim())) {
+      faltando.push('Pelo menos uma cor com nome');
+    }
+  }
+
+  return faltando;
+}
+
+function mostrarAvisoPasso(stepId, faltando, onContinuar) {
+  const body = document.querySelector(`#${stepId} .card-body`);
+  if (!body) return;
+  let box = document.getElementById('avisoValidacao');
+  if (box) box.remove();
+  box = document.createElement('div');
+  box.id = 'avisoValidacao';
+  box.className = 'aviso-validacao';
+  box.innerHTML = `
+    <strong>Faltam informações</strong>
+    <ul>${faltando.map(f => `<li>${f}</li>`).join('')}</ul>
+    <div class="btn-row">
+      <button type="button" class="btn secondary" id="btnCorrigir">Corrigir</button>
+      <button type="button" class="btn primary" id="btnSeguirMesmo">Continuar mesmo assim</button>
+    </div>
+  `;
+  body.appendChild(box);
+  document.getElementById('btnCorrigir').onclick = () => box.remove();
+  document.getElementById('btnSeguirMesmo').onclick = () => {
+    box.remove();
+    onContinuar();
+  };
+}
+
+function continuarPasso(stepAtual) {
+  const idx = passos.indexOf(stepAtual);
+  const faltando = validarPasso(stepAtual);
+  if (faltando.length) {
+    mostrarAvisoPasso(stepAtual, faltando, () => {
+      if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
+    });
+    return;
+  }
+  if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
+}
+
+function toggleCard(id) {
+  abrirPasso(id);
+}
+
 adicionarCor();
 renderEstoques();
 validarDimensoes();
+abrirPasso('step1');
