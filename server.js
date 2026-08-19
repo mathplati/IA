@@ -128,6 +128,15 @@ function extrairMarcaTitulo(titulo) {
   return '';
 }
 
+function limparFinalDescricao(texto) {
+  if (!texto) return '';
+  return String(texto)
+    .replace(/Todos os produtos anunciados são originais[\s\S]*$/i, '')
+    .replace(/Somos dedicados a fornecer produtos originais[\s\S]*$/i, '')
+    .replace(/Somos especialistas em calçados femininos[\s\S]*$/i, '')
+    .trim();
+}
+
 app.post('/processar-fotos', upload.array('fotos', 4), async (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
@@ -237,11 +246,13 @@ Adquiridos diretamente das fábricas e seus distribuidores.
 Produto com garantia.
 Dúvidas?
 Entre em contato conosco fazendo uma pergunta abaixo.`;
+
     const bloco2 = `Somos dedicados a fornecer produtos originais de alta qualidade, com estilo, conforto e durabilidade.
 Cada venda é cuidadosamente preparada para atender às necessidades dos nossos clientes,
 proporcionando uma experiência única de compra.
    
     Envio em até 24 horas`;
+
     const bloco3 = `Somos especialistas em calçados femininos, masculinos e infantis,
 oferecendo o que há de melhor em qualidade, tendência e preço justo.
 Aqui você encontra desde os clássicos até os lançamentos das marcas mais queridas do Brasil!`;
@@ -349,7 +360,6 @@ Responda APENAS JSON:
     if (!jsonMatch) throw new Error('IA não retornou JSON de campos');
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // aplica overrides fixos locais (não confia só na IA)
     const finais = [];
     for (const { nome, regra } of camposRegra) {
       let valor = '';
@@ -369,10 +379,8 @@ Responda APENAS JSON:
       if (String(regra).includes('tamanho') || /tamanho/i.test(nome)) {
         if (categoriasRegras.regras_gerais.tamanho === 'nunca') valor = '';
       }
-      if (/marca\s*shopee/i.test(nome) || regra === 'nunca' && /shopee/i.test(nome)) {
-        if (/shopee/i.test(nome) && categoriasRegras.regras_gerais.marca_shopee === 'nunca') {
-          if (/marca/i.test(nome)) valor = '';
-        }
+      if (/shopee/i.test(nome) && /marca/i.test(nome) && categoriasRegras.regras_gerais.marca_shopee === 'nunca') {
+        valor = '';
       }
 
       finais.push({ nome, valor: valor == null ? '' : String(valor), regra });
@@ -406,14 +414,6 @@ app.get('/teste-campos', async (req, res) => {
   }
 });
 
-function limparFinalDescricao(texto) {
-  if (!texto) return '';
-  return String(texto)
-    .replace(/Todos os produtos anunciados são originais[\s\S]*$/i, '')
-    .replace(/Somos dedicados a fornecer produtos originais[\s\S]*$/i, '')
-    .replace(/Somos especialistas em calçados femininos[\s\S]*$/i, '')
-    .trim();
-}
 app.post('/enviar-campos-bling', async (req, res) => {
   try {
     const { codigoPai, campos = [] } = req.body;
@@ -428,7 +428,6 @@ app.post('/enviar-campos-bling', async (req, res) => {
         .trim();
     }
 
-    // 1) busca produto
     const busca = await blingRequest(
       `https://www.bling.com.br/Api/v3/produtos?codigo=${encodeURIComponent(codigoPai)}`
     );
@@ -440,14 +439,12 @@ app.post('/enviar-campos-bling', async (req, res) => {
       });
     }
 
-    // 2) lista campos Bling
     const listaCamposRes = await blingRequest(
       'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309'
     );
     const listaCampos = await listaCamposRes.json();
     const camposBling = listaCampos?.data || [];
 
-    // mapa: nome normalizado -> { id, nomeOriginal }
     const mapa = {};
     for (const c of camposBling) {
       mapa[normalizar(c.nome)] = { id: c.id, nome: c.nome };
@@ -465,7 +462,6 @@ app.post('/enviar-campos-bling', async (req, res) => {
       const key = normalizar(nome);
       let match = mapa[key];
 
-      // fallback: contém
       if (!match) {
         const key2 = Object.keys(mapa).find(k => k.includes(key) || key.includes(k));
         if (key2) match = mapa[key2];
@@ -512,7 +508,7 @@ app.post('/enviar-campos-bling', async (req, res) => {
       return res.status(400).json({
         error: 'Nenhum campo válido para enviar',
         naoEncontrados,
-        dica: 'Os nomes do site não bateram com os nomes no Bling. Veja a lista naoEncontrados.'
+        dica: 'Os nomes do site não bateram com os nomes no Bling.'
       });
     }
 
@@ -546,101 +542,7 @@ app.post('/enviar-campos-bling', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-    // 2) lista campos customizados e monta mapa nome -> id
-    const listaCamposRes = await blingRequest(
-      'https://www.bling.com.br/Api/v3/campos-customizados/modulos/98309'
-    );
-    const listaCampos = await listaCamposRes.json();
-    const mapaNomeId = {};
-    for (const c of (listaCampos?.data || [])) {
-      mapaNomeId[String(c.nome).trim().toLowerCase()] = c.id;
-    }
 
-    // 3) monta payload camposCustomizados
-    const camposPayload = [];
-    const naoEncontrados = [];
-
-    for (const item of campos) {
-      const nome = String(item.nome || '').trim();
-      const valor = String(item.valor || '').trim();
-      if (!nome || !valor) continue;
-
-      const idCampo = mapaNomeId[nome.toLowerCase()];
-      if (!idCampo) {
-        naoEncontrados.push(nome);
-        continue;
-      }
-
-      // tenta pegar opções (lista)
-      let idValor = null;
-      try {
-        const detRes = await blingRequest(
-          `https://www.bling.com.br/Api/v3/campos-customizados/${idCampo}`
-        );
-        const det = await detRes.json();
-        const opcoes = det?.data?.opcoes || [];
-        if (opcoes.length) {
-          const op = opcoes.find(
-            o => String(o.nome).trim().toLowerCase() === valor.toLowerCase()
-          );
-          if (op && op.id) idValor = op.id;
-        }
-      } catch (e) {
-        console.log('Sem opções para', nome);
-      }
-
-      if (idValor) {
-        camposPayload.push({
-          idCampoCustomizado: idCampo,
-          idValorCampoCustomizado: idValor
-        });
-      } else {
-        // campo texto livre
-        camposPayload.push({
-          idCampoCustomizado: idCampo,
-          valor: valor
-        });
-      }
-    }
-
-    if (!camposPayload.length) {
-      return res.status(400).json({
-        error: 'Nenhum campo válido para enviar',
-        naoEncontrados
-      });
-    }
-
-    // 4) atualiza produto
-    const putRes = await blingRequest(
-      `https://www.bling.com.br/Api/v3/produtos/${produto.id}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify({
-          camposCustomizados: camposPayload
-        })
-      }
-    );
-    const putData = await putRes.json();
-
-    if (!putRes.ok) {
-      console.error('Erro PUT produto:', putData);
-      return res.status(putRes.status).json({
-        error: putData?.error?.message || 'Falha ao atualizar produto no Bling',
-        detalhe: putData
-      });
-    }
-
-    res.json({
-      success: true,
-      produtoId: produto.id,
-      enviados: camposPayload.length,
-      naoEncontrados
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
