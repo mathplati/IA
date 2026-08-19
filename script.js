@@ -539,6 +539,117 @@ async function gerarExcel() {
   if (!el) return;
   el.classList.toggle('open');
 }
+    const passos = ['step1', 'step2', 'step3', 'step4', 'step5'];
+
+function abrirPasso(id) {
+  passos.forEach(pid => {
+    const el = document.getElementById(pid);
+    if (!el) return;
+    if (pid === id) el.classList.add('open');
+    else el.classList.remove('open');
+  });
+  const alvo = document.getElementById(id);
+  if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function limparErros() {
+  document.querySelectorAll('.field.erro').forEach(el => el.classList.remove('erro'));
+  document.querySelectorAll('.dica-erro').forEach(el => el.remove());
+}
+
+function marcarErro(inputId, msg) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const field = input.closest('.field');
+  if (!field) return;
+  field.classList.add('erro');
+  const dica = document.createElement('small');
+  dica.className = 'dica-erro';
+  dica.textContent = msg;
+  field.appendChild(dica);
+}
+
+function validarPasso(stepId) {
+  limparErros();
+  const faltando = [];
+
+  if (stepId === 'step1') {
+    const titulo = document.getElementById('tituloBase').value.trim();
+    const sku = document.getElementById('codigoPai').value.trim();
+    const preco = document.getElementById('preco').value;
+    if (!titulo) {
+      faltando.push('Título base');
+      marcarErro('tituloBase', 'Ex: Sandália Papete Beira Rio 8524.110');
+    }
+    if (!sku) {
+      faltando.push('SKU base (pai)');
+      marcarErro('codigoPai', 'Ex: 8524.110-L4');
+    }
+    if (!preco || Number(preco) <= 0) {
+      faltando.push('Preço');
+      marcarErro('preco', 'Informe um preço maior que zero');
+    }
+    if (!getTamanhos().length) {
+      faltando.push('Grade de tamanho');
+      marcarErro('tipoTamanho', 'Escolha a grade ou tamanhos personalizados');
+    }
+  }
+
+  if (stepId === 'step2') {
+    const ok = cores.some(c => c.nome && c.nome.trim());
+    if (!ok) faltando.push('Pelo menos uma cor com nome');
+  }
+
+  return faltando;
+}
+
+function continuarPasso(stepAtual) {
+  const idx = passos.indexOf(stepAtual);
+  const faltando = validarPasso(stepAtual);
+
+  if (faltando.length) {
+    mostrarAvisoPasso(stepAtual, faltando, () => {
+      if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
+    });
+    return;
+  }
+
+  if (idx < passos.length - 1) abrirPasso(passos[idx + 1]);
+}
+
+function mostrarAvisoPasso(stepId, faltando, onContinuar) {
+  const body = document.querySelector(`#${stepId} .card-body`);
+  if (!body) return;
+
+  let box = document.getElementById('avisoValidacao');
+  if (box) box.remove();
+
+  box = document.createElement('div');
+  box.id = 'avisoValidacao';
+  box.className = 'aviso-validacao';
+  box.innerHTML = `
+    <strong>Faltam informações</strong>
+    <ul>${faltando.map(f => `<li>${f}</li>`).join('')}</ul>
+    <div class="btn-row">
+      <button type="button" class="btn secondary" id="btnCorrigir">Corrigir</button>
+      <button type="button" class="btn primary" id="btnSeguirMesmo">Continuar mesmo assim</button>
+    </div>
+  `;
+  body.appendChild(box);
+
+  document.getElementById('btnCorrigir').onclick = () => box.remove();
+  document.getElementById('btnSeguirMesmo').onclick = () => {
+    box.remove();
+    onContinuar();
+  };
+}
+
+function toggleCard(id) {
+  abrirPasso(id);
+}
+
+// inicia no passo 1
+abrirPasso('step1');
 
     coresComUrls.forEach(cor => {
       const fotosCor = (cor.fotosUrls || []).join('|');
