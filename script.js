@@ -534,6 +534,11 @@ async function gerarExcel() {
       '0', '0', '0',
       '0', categoria, infoAdicional
     ]);
+    function toggleCard(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('open');
+}
 
     coresComUrls.forEach(cor => {
       const fotosCor = (cor.fotosUrls || []).join('|');
