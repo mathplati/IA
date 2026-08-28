@@ -23,7 +23,7 @@ const departamentos = {
   custom: 'Feminino'
 };
 
-const passos = ['step1', 'step2', 'step3', 'step4', 'step5'];
+const passos = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
 
 document.getElementById('tipoTamanho').addEventListener('change', () => {
   const tipo = document.getElementById('tipoTamanho').value;
@@ -685,6 +685,50 @@ function continuarPasso(stepAtual) {
 
 function toggleCard(id) {
   abrirPasso(id);
+}
+
+function toggleCard(id) {
+  abrirPasso(id);
+}
+
+function precoConta(base, extra) {
+  const n = Number(String(base).replace(',', '.')) || 0;
+  return (n + extra).toFixed(2).replace('.', ',');
+}
+
+function exportarBling() {
+  const sku = (document.getElementById('skuExport').value || document.getElementById('codigoPai').value || '').trim();
+  const preco = document.getElementById('preco').value;
+  const tituloBase = document.getElementById('tituloBase').value.trim();
+
+  if (!sku) {
+    mostrarStatus('Preencha o SKU pai no passo 6 (ou no passo 1).', 'erro', 'statusExport');
+    return;
+  }
+
+  const t1 = (titulosGerados[0] || tituloSelecionado || tituloBase || '');
+  const t2 = (titulosGerados[1] || t1);
+  const t3 = (titulosGerados[2] || t1);
+  const d1 = (descricoesGeradas[0] || descricaoSelecionada || '');
+  const d2 = (descricoesGeradas[1] || d1);
+  const d3 = (descricoesGeradas[2] || d1);
+
+  const payload = {
+    skuPai: sku,
+    contas: [
+      { nome: 'Anelo', ml: 'Aneloshoes Mercadolivre', shopee: 'Aneloshoes Shopee', titulo: t1, descricao: d1, preco: precoConta(preco, 0) },
+      { nome: 'B&B', ml: 'B&B Mercadolivre', shopee: 'B&B Shopee', titulo: t2, descricao: d2, preco: precoConta(preco, 10) },
+      { nome: 'Beleza', ml: 'Beleza Expressa Mercadolivre', shopee: 'Loja Beleza Expressa SHOPEE', titulo: t3, descricao: d3, preco: precoConta(preco, 20) }
+    ]
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'exportar-bling.json';
+  a.click();
+
+  mostrarStatus('Arquivo exportar-bling.json baixado. Esse arquivo o robô do PC vai usar.', 'sucesso', 'statusExport');
 }
 
 adicionarCor();
