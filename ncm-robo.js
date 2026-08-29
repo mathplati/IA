@@ -202,16 +202,51 @@ async function montarPendentesSemNcm(contaIds) {
   return resultado;
 }
 
+function formatNcm(valor) {
+  const d = ncmLimpo(valor);
+  if (d.length !== 8) return d;
+  return `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6)}`;
+}
+
+function dataOperacaoValida(nota) {
+  const raw = String(nota.dataOperacao || '');
+  if (raw && !raw.startsWith('0000')) return raw;
+  const em = String(nota.dataEmissao || '');
+  return em ? `${em.slice(0, 10)} 00:00:00` : '';
+}
+
 function payloadAtualizacao(nota, itensAlvo) {
   const itens = (nota.itens || []).map((item, idx) => {
-    const alvo = itensAlvo.find(x => x.index === idx);
-    const copiado = { ...item };
-    if (alvo && ncmValido(alvo.ncm)) {
-      copiado.classificacaoFiscal = ncmLimpo(alvo.ncm);
-    }
-    return copiado;
+    const alvo = itensAlvo.find(x => Number(x.index) === idx);
+    const ncm = alvo && ncmValido(alvo.ncm)
+      ? formatNcm(alvo.ncm)
+      : (item.classificacaoFiscal || '');
+    return {
+      codigo: item.codigo || '',
+      descricao: item.descricao || '',
+      unidade: item.unidade || 'UN',
+      quantidade: item.quantidade || 1,
+      valor: item.valor || 0,
+      tipo: item.tipo || 'P',
+      classificacaoFiscal: ncm,
+      origem: item.origem == null ? 0 : item.origem,
+      cfop: item.cfop || ''
+    };
   });
-  return { ...nota, itens };
+
+  const contato = nota.contato || {};
+  return {
+    tipo: nota.tipo || 1,
+    numero: nota.numero,
+    dataOperacao: dataOperacaoValida(nota),
+    contato: {
+      id: contato.id,
+      nome: contato.nome,
+      numeroDocumento: contato.numeroDocumento
+    },
+    naturezaOperacao: { id: (nota.naturezaOperacao || {}).id },
+    itens
+  };
 }
 
 async function preencherNotas(contaId, notasPayload) {
@@ -251,10 +286,30 @@ async function preencherNotas(contaId, notasPayload) {
         });
         continue;
       }
+
+      const envRes = await bling(
+        contaId,
+        `https://www.bling.com.br/Api/v3/nfe/${alvo.notaId}/enviar?enviarEmail=false`,
+        { method: 'POST', body: JSON.stringify({}) }
+      );
+      const envData = await envRes.json();
+      if (!envRes.ok) {
+        saida.push({
+          notaId: alvo.notaId,
+          numero: nota.numero,
+          ok: false,
+          erro: 'NCM gravado, mas o envio falhou: ' +
+            (envData?.error?.message || envData?.error?.description || String(envRes.status)),
+          detalhe: envData
+        });
+        continue;
+      }
+
       saida.push({
         notaId: alvo.notaId,
         numero: nota.numero,
         ok: true,
+        enviado: true,
         itens: (alvo.itens || []).length
       });
     } catch (err) {
