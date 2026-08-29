@@ -835,7 +835,7 @@ async function preencherNotasNcm() {
       if (!res.ok) throw new Error(data.error || 'Falha ao preencher');
       for (const r of data.resultado || []) {
         logs.push(r.ok
-          ? `OK NF ${r.numero || r.notaId} (${r.itens} item)`
+          ? `OK NF ${r.numero || r.notaId} — NCM + enviada`
           : `ERRO NF ${r.numero || r.notaId}: ${r.erro}`);
       }
     }
