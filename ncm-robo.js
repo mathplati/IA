@@ -236,6 +236,23 @@ function payloadAtualizacao(nota, itensAlvo) {
 
   const contato = nota.contato || {};
   return {
+    id: nota.id,
+    tipo: nota.tipo || 1,
+    numero: nota.numero,
+    serie: nota.serie,
+    dataOperacao: dataOperacaoValida(nota),
+    contato: {
+      id: contato.id,
+      nome: contato.nome,
+      numeroDocumento: contato.numeroDocumento
+    },
+    naturezaOperacao: { id: (nota.naturezaOperacao || {}).id },
+    itens
+  };
+}
+
+  const contato = nota.contato || {};
+  return {
     tipo: nota.tipo || 1,
     numero: nota.numero,
     dataOperacao: dataOperacaoValida(nota),
