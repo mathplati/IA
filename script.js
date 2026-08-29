@@ -731,6 +731,120 @@ function exportarBling() {
   mostrarStatus('Arquivo exportar-bling.json baixado. Esse arquivo o robô do PC vai usar.', 'sucesso', 'statusExport');
 }
 
+let notasNcmCache = [];
+
+function mostrarAba(qual) {
+  const gerador = document.getElementById('painelGerador');
+  const ncm = document.getElementById('painelNcm');
+  document.getElementById('abaGerador').classList.toggle('ativa', qual === 'gerador');
+  document.getElementById('abaNcm').classList.toggle('ativa', qual === 'ncm');
+  gerador.style.display = qual === 'gerador' ? '' : 'none';
+  ncm.style.display = qual === 'ncm' ? '' : 'none';
+}
+
+function setStatusNcm(texto, tipo) {
+  const el = document.getElementById('statusNcm');
+  el.textContent = texto || '';
+  el.className = 'status' + (tipo ? ' ' + tipo : '');
+}
+
+function renderNotasNcm() {
+  const box = document.getElementById('listaNotasNcm');
+  if (!notasNcmCache.length) {
+    box.innerHTML = '<p class="hint">Nenhuma nota pendente sem NCM.</p>';
+    return;
+  }
+  box.innerHTML = notasNcmCache.map((n, ni) => `
+    <div class="ncm-nota">
+      <label style="display:flex;gap:8px;align-items:center">
+        <input type="checkbox" class="ncm-check" data-i="${ni}" checked />
+        <h3 style="margin:0">${n.contaNome} · NF ${n.numero || n.notaId} · ${n.cliente || 'sem cliente'}</h3>
+      </label>
+      ${(n.itens || []).map((item, ii) => `
+        <div class="ncm-item">
+          <span>${item.codigo || '-'} — ${item.descricao || ''}</span>
+          <input type="text" value="${item.ncmSugerido || ''}" data-ni="${ni}" data-ii="${ii}" placeholder="NCM 8 dígitos" />
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+async function buscarNotasNcm() {
+  const contas = document.getElementById('ncmConta').value.split(',').map(s => s.trim()).filter(Boolean);
+  setStatusNcm('Buscando notas pendentes...', '');
+  try {
+    const res = await fetch('/ncm/buscar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contas })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Falha na busca');
+    notasNcmCache = data.notas || [];
+    renderNotasNcm();
+    setStatusNcm(`${notasNcmCache.length} nota(s) pendente(s) com item sem NCM.`, 'sucesso');
+  } catch (err) {
+    setStatusNcm(err.message, 'erro');
+  }
+}
+
+async function preencherNotasNcm() {
+  const checks = [...document.querySelectorAll('.ncm-check')];
+  const escolhidas = checks.filter(c => c.checked).map(c => Number(c.dataset.i));
+  if (!escolhidas.length) {
+    setStatusNcm('Selecione ao menos uma nota.', 'erro');
+    return;
+  }
+
+  document.querySelectorAll('#listaNotasNcm input[data-ni]').forEach(inp => {
+    const ni = Number(inp.dataset.ni);
+    const ii = Number(inp.dataset.ii);
+    if (notasNcmCache[ni] && notasNcmCache[ni].itens[ii]) {
+      notasNcmCache[ni].itens[ii].ncmSugerido = inp.value.trim();
+    }
+  });
+
+  const porConta = {};
+  for (const i of escolhidas) {
+    const n = notasNcmCache[i];
+    if (!n) continue;
+    const itens = (n.itens || [])
+      .filter(it => /^\d{8}$/.test(String(it.ncmSugerido || '').replace(/\D/g, '')))
+      .map(it => ({ index: it.index, ncm: String(it.ncmSugerido).replace(/\D/g, '') }));
+    if (!itens.length) continue;
+    if (!porConta[n.contaId]) porConta[n.contaId] = [];
+    porConta[n.contaId].push({ notaId: n.notaId, itens });
+  }
+
+  if (!Object.keys(porConta).length) {
+    setStatusNcm('Nenhum item com NCM de 8 dígitos para enviar.', 'erro');
+    return;
+  }
+
+  setStatusNcm('Preenchendo no Bling...', '');
+  const logs = [];
+  try {
+    for (const [contaId, notas] of Object.entries(porConta)) {
+      const res = await fetch('/ncm/preencher', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contaId, notas })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Falha ao preencher');
+      for (const r of data.resultado || []) {
+        logs.push(r.ok
+          ? `OK NF ${r.numero || r.notaId} (${r.itens} item)`
+          : `ERRO NF ${r.numero || r.notaId}: ${r.erro}`);
+      }
+    }
+    setStatusNcm(logs.join(' | '), logs.some(l => l.startsWith('ERRO')) ? 'erro' : 'sucesso');
+  } catch (err) {
+    setStatusNcm(err.message, 'erro');
+  }
+}
+
 adicionarCor();
 renderEstoques();
 validarDimensoes();
