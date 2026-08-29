@@ -6,6 +6,7 @@ const path = require('path');
 const multer = require('multer');
 const FormData = require('form-data');
 const categoriasRegras = require('./categorias-regras');
+const ncmRobo = require('./ncm-robo');
 
 const app = express();
 app.use(cors());
@@ -537,6 +538,38 @@ app.post('/enviar-campos-bling', async (req, res) => {
       naoEncontrados,
       enviadosDebug
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/ncm/contas', (req, res) => {
+  res.json({
+    contas: Object.values(ncmRobo.CONTAS).map(c => ({ id: c.id, nome: c.nome }))
+  });
+});
+
+app.post('/ncm/buscar', async (req, res) => {
+  try {
+    const contas = Array.isArray(req.body?.contas) && req.body.contas.length
+      ? req.body.contas
+      : ['beleza', 'bb'];
+    const notas = await ncmRobo.montarPendentesSemNcm(contas);
+    res.json({ success: true, total: notas.length, notas });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/ncm/preencher', async (req, res) => {
+  try {
+    const { contaId, notas = [] } = req.body || {};
+    if (!contaId) return res.status(400).json({ error: 'contaId obrigatório' });
+    if (!notas.length) return res.status(400).json({ error: 'Nenhuma nota enviada' });
+    const resultado = await ncmRobo.preencherNotas(contaId, notas);
+    res.json({ success: true, resultado });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
