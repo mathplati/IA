@@ -44,6 +44,55 @@ header p {
   margin-top: 6px;
 }
 
+.abas {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.aba {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.aba.ativa {
+  background: var(--bling-green);
+  border-color: var(--bling-green);
+  color: #fff;
+}
+
+.ncm-nota {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.ncm-nota h3 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+.ncm-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 4px 0;
+}
+
+.ncm-item input {
+  width: 110px;
+}
+
 /* CARD / STEP */
 .card {
   background: var(--card);
