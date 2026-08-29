@@ -13,8 +13,40 @@
     <header>
       <h1>Gerador de Anúncios Bling</h1>
       <p>Produto → variações → fotos → planilha pronta</p>
+      <div class="abas">
+        <button type="button" class="aba ativa" id="abaGerador" onclick="mostrarAba('gerador')">Gerador</button>
+        <button type="button" class="aba" id="abaNcm" onclick="mostrarAba('ncm')">NCM nas notas</button>
+      </div>
     </header>
 
+    <div id="painelNcm" class="painel-aba" style="display:none">
+      <section class="card open">
+        <div class="card-header">
+          <h2>Preencher NCM — notas pendentes</h2>
+        </div>
+        <div class="card-body">
+          <p class="hint">Só notas pendentes. Contas: Beleza e Calçados B&amp;B. Não altera nota autorizada.</p>
+          <div class="form-grid">
+            <div class="field">
+              <label>Conta</label>
+              <select id="ncmConta">
+                <option value="beleza,bb">As duas</option>
+                <option value="beleza">Beleza</option>
+                <option value="bb">Calçados B&amp;B</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="btn primary" onclick="buscarNotasNcm()">Buscar notas sem NCM</button>
+            <button type="button" class="btn secondary" onclick="preencherNotasNcm()">Preencher selecionadas</button>
+          </div>
+          <div id="statusNcm" class="status"></div>
+          <div id="listaNotasNcm" style="margin-top:14px"></div>
+        </div>
+      </section>
+    </div>
+
+    <div id="painelGerador" class="painel-aba">
     <!-- 1 -->
     <section class="card open" id="step1">
       <div class="card-header" onclick="toggleCard('step1')">
@@ -229,6 +261,7 @@
       <button type="button" class="btn primary" onclick="gerarExcel()">Baixar Planilha</button>
     </div>
     <div id="status" class="status"></div>
+    </div>
   </div>
 
   <div id="modalDimensoes" class="modal-overlay" style="display:none">
