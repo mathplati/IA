@@ -251,21 +251,7 @@ function payloadAtualizacao(nota, itensAlvo) {
   };
 }
 
-  const contato = nota.contato || {};
-  return {
-    tipo: nota.tipo || 1,
-    numero: nota.numero,
-    dataOperacao: dataOperacaoValida(nota),
-    contato: {
-      id: contato.id,
-      nome: contato.nome,
-      numeroDocumento: contato.numeroDocumento
-    },
-    naturezaOperacao: { id: (nota.naturezaOperacao || {}).id },
-    itens
-  };
-}
-
+  
 async function preencherNotas(contaId, notasPayload) {
   const saida = [];
   for (const alvo of notasPayload) {
